@@ -1,0 +1,87 @@
+/* Dash dropdown dark theme overrides */
+.Select-control {
+    background-color: #1e1e38 !important;
+    border-color: #555 !important;
+}
+.Select-placeholder,
+.Select-value-label {
+    color: #eee !important;
+}
+.Select-input > input {
+    color: #eee !important;
+    background-color: transparent !important;
+}
+.Select-arrow {
+    border-color: #aaa transparent transparent !important;
+}
+.Select-menu-outer {
+    background-color: #1e1e38 !important;
+    border-color: #555 !important;
+    z-index: 9999 !important;
+}
+.Select-option {
+    background-color: #1e1e38 !important;
+    color: #eee !important;
+}
+.Select-option.is-focused {
+    background-color: #2d2d5a !important;
+    color: #fff !important;
+}
+.Select-option.is-selected {
+    background-color: #3a3a7a !important;
+    color: #fff !important;
+}
+.VirtualizedSelectOption {
+    color: #eee !important;
+    background-color: #1e1e38 !important;
+}
+.VirtualizedSelectFocusedOption {
+    background-color: #2d2d5a !important;
+    color: #fff !important;
+}
+.Select-noresults {
+    color: #aaa !important;
+    background-color: #1e1e38 !important;
+}
+
+/* Custom symbol input */
+.custom-sym-input {
+    width: 100%;
+    padding: 7px 10px;
+    background-color: #1e1e38;
+    color: #eee;
+    border: 1px solid #555;
+    border-radius: 4px;
+    font-size: 13px;
+    box-sizing: border-box;
+    margin-top: 6px;
+}
+.custom-sym-input::placeholder {
+    color: #888;
+}
+.load-btn {
+    width: 100%;
+    margin-top: 6px;
+    padding: 8px;
+    background-color: #2d2d5a;
+    color: #eee;
+    border: 1px solid #555;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+}
+.load-btn:hover {
+    background-color: #3a3a7a;
+}
+
+/* Dark theme for the top-level tabs */
+.tab {
+    background-color: #1e1e38 !important;
+    color: #bbb !important;
+    border-color: #555 !important;
+}
+.tab--selected {
+    background-color: #2d2d5a !important;
+    color: #fff !important;
+    border-top: 2px solid #4c8bf5 !important;
+}

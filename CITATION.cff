@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "Quant Systems: market impact, signal decay and 3D risk surface dashboard"
+type: software
+authors:
+  - family-names: "Osahan"
+    given-names: "Maahin Bir Singh"
+repository-code: "https://github.com/maahin-1/quant-systems-market-impact-signal-risk-collection"
+license: MIT
+keywords:
+  - quantitative finance
+  - market impact
+  - signal decay
+  - risk surface
+  - dash
+  - plotly
+  - yfinance

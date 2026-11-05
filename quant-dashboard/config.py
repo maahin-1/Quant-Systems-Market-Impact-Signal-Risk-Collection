@@ -56,7 +56,7 @@ SYMBOL_OPTIONS = [
 
 REFRESH_INTERVAL = 300
 OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "")
-DEFAULT_MODEL = "qwen/qwen3-coder:free"
+DEFAULT_MODEL = os.environ.get("OPENROUTER_MODEL", "nvidia/nemotron-3-ultra-550b-a55b:free")
 
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "")

@@ -53,4 +53,5 @@ def test_query_llm_raises_when_all_models_fail(mock_post):
     from llm.client import query_llm
     with pytest.raises(RuntimeError, match="All free models failed"):
         query_llm("prompt")
-    assert mock_post.call_count == 9
+    from llm.client import _FALLBACK_MODELS
+    assert mock_post.call_count == len(set(_FALLBACK_MODELS))

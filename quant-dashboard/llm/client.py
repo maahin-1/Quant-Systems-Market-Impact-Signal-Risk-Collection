@@ -7,16 +7,18 @@ _URL = "https://openrouter.ai/api/v1/chat/completions"
 
 # Fallback chain — tried in order. Free models often rate-limit upstream;
 # if one provider is saturated we move to the next.
+#
+# The free tier changes often. Check https://openrouter.ai/models?q=free and
+# update this list (or set OPENROUTER_MODEL in .env) if every call starts failing.
 _FALLBACK_MODELS = [
     DEFAULT_MODEL,
-    "openai/gpt-oss-20b:free",
-    "openai/gpt-oss-120b:free",
-    "z-ai/glm-4.5-air:free",
-    "qwen/qwen3-next-80b-a3b-instruct:free",
-    "google/gemma-3-27b-it:free",
-    "google/gemma-3-12b-it:free",
-    "meta-llama/llama-3.3-70b-instruct:free",
-    "nvidia/nemotron-nano-9b-v2:free",
+    "cohere/north-mini-code:free",
+    "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+    "google/gemma-4-31b-it:free",
+    "google/gemma-4-26b-a4b-it:free",
+    "xingchen-agi/xing4.0-29b-a4b:free",
+    "nvidia/nemotron-3.5-lightning:free",
+    "recursive/flint-v1.0:free",
 ]
 
 
@@ -30,7 +32,9 @@ def _post(model: str, prompt: str) -> requests.Response:
     payload = {
         "model": model,
         "messages": [{"role": "user", "content": prompt}],
-        "max_tokens": 500,
+        # Reasoning models spend part of this budget thinking, so keep it generous
+        # or the visible answer gets cut off mid-sentence.
+        "max_tokens": 2000,
     }
     return requests.post(_URL, json=payload, headers=headers, timeout=30)
 

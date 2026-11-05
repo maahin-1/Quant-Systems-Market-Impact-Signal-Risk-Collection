@@ -7,7 +7,7 @@
 ![Supabase](https://img.shields.io/badge/storage-Supabase%20(optional)-3FCF8E?logo=supabase&logoColor=white)
 ![Tests](https://img.shields.io/badge/tests-41%20passing-brightgreen)
 
-**Quant Systems is an open-source Python dashboard for quantitative analysis of Indian equities, commodities and forex.** Pick one or more symbols, and it pulls live market data from yfinance and draws three views: **market impact** (cumulative log-returns, rolling volatility, relative volume and activity), **signal decay** (autocorrelation curves with a computed half-life) and a **3D risk surface** (rolling volatility across symbols and time). Each tab also has an **Ask LLM** button that sends the chart context to OpenRouter for a plain-language read-out.
+**Quant Systems is an open-source Python dashboard for quantitative analysis of Indian equities, commodities and forex.** Pick one or more symbols, and it pulls live market data from yfinance and draws three views: **market impact** (cumulative log-returns, rolling volatility, relative volume and activity), **signal decay** (autocorrelation curves with a computed half-life) and a **3D risk surface** (rolling volatility across lag and asset). The Market Impact and Signal Decay tabs also have an **Ask LLM** button that sends the chart context to OpenRouter and shows a plain-language read-out under the chart.
 
 It is built for students, retail quants and developers who want a small, readable example of a market-analytics app in Dash and Plotly. It is an analytics and learning tool, **not investment advice** and not a trading system.
 
@@ -38,25 +38,31 @@ It is built for students, retail quants and developers who want a small, readabl
 | --- | --- |
 | **Market Impact** | Cumulative log-returns (%), rolling volatility (20-bar standard deviation), relative volume (multiple of the mean) and rolling activity (20-bar mean absolute return) for one or many symbols |
 | **Signal Decay** | Autocorrelation of returns for lags 1 to 30, with a half-life per symbol (the first lag where correlation falls below half of its peak) |
-| **3D Risk Surface** | A 3D surface of rolling volatility across several symbols and time, for comparing risk between assets |
+| **3D Risk Surface** | A 3D surface of rolling volatility across lag (bars) and asset, for comparing risk between several symbols. No LLM button on this tab. |
 
 - **Multi-symbol selection** with a searchable dropdown of NSE stocks, commodity futures and INR forex pairs, plus a **Load Symbols** button that triggers the charts.
 - **Time periods** from 5 days of 5-minute bars up to 1 year of daily bars.
-- **Ask LLM** on every tab. It tries a nine-model free-tier fallback chain on OpenRouter, so one rate-limited model does not break the feature.
+- **Ask LLM** on the Market Impact and Signal Decay tabs. It tries an eight-model free-tier fallback chain on OpenRouter, so one rate-limited model does not break the feature.
 - **In-memory cache** with background refresh and anomaly detection for the default watchlist.
 - **Optional persistence** of OHLCV data to a Supabase table.
 
 ## Screenshots
 
-### Signal decay: how quickly return autocorrelation fades
+### Market impact with LLM analysis
 
-![Signal Decay tab showing autocorrelation by lag for RELIANCE.NS](docs/images/signal-decay.png)
+![Market Impact tab with cumulative log returns for RELIANCE.NS and the LLM analysis written by nvidia/nemotron-3-ultra-550b-a55b:free](docs/images/market-impact.png)
 
-### 3D risk surface: rolling volatility across RELIANCE, TCS and INFY
+The **LLM Analysis** panel under the chart shows the model that answered (`[via ...]`) and its read-out of the market impact fit.
 
-![3D Risk Surface tab showing a rolling volatility surface for three NSE stocks](docs/images/risk-surface.png)
+### Signal decay with LLM analysis
 
-*Screenshots are from a real run of the app with live yfinance data. The figures depend on the market data available on the day you run it.*
+![Signal Decay tab with autocorrelation by lag for RELIANCE.NS and the LLM analysis written by cohere/north-mini-code:free](docs/images/signal-decay.png)
+
+### 3D risk surface: rolling volatility across lag and asset
+
+![3D Risk Surface tab showing a rolling volatility surface for RELIANCE.NS, TCS.NS and INFY.NS](docs/images/risk-surface.png)
+
+*Screenshots are from a real run with live yfinance data and live OpenRouter free models. Figures and LLM wording vary with the market data and the model that answers.*
 
 ---
 
@@ -70,7 +76,7 @@ $ python -m pytest tests/ -q
 41 passed in 2.30s
 ```
 
-The app was then started with `python app.py`, opened at `http://127.0.0.1:8050`, and all three tabs were loaded with live data for RELIANCE.NS, TCS.NS and INFY.NS. The screenshots above come from that session. The **Ask LLM** feature was not exercised in that session, because it needs an OpenRouter API key; its request, fallback and error paths are covered by unit tests with the network mocked.
+The app was then started with `python app.py`, opened at `http://127.0.0.1:8050`, and all three tabs were loaded with live data for RELIANCE.NS, TCS.NS and INFY.NS. The screenshots above come from that session. **Ask LLM** was then run with a real OpenRouter key on the Market Impact tab (answered by `nvidia/nemotron-3-ultra-550b-a55b:free`) and on the Signal Decay tab (answered by `cohere/north-mini-code:free` after a first-choice model did not return text). The request, fallback and error paths are also covered by unit tests with the network mocked.
 
 ---
 
@@ -83,7 +89,7 @@ flowchart LR
     C --> D[Analytics modules<br/>market impact, signal decay, risk surface]
     D --> E[Plotly figures<br/>in the Dash tabs]
     D --> F[Prompt templates]
-    F --> G[OpenRouter<br/>9-model fallback chain]
+    F --> G[OpenRouter<br/>8-model fallback chain]
     B -. optional .-> H[(Supabase<br/>OHLCV table)]
 ```
 
@@ -96,7 +102,7 @@ flowchart LR
 
 ## Quick start
 
-**Verified on Python 3.11 on Windows.** The pinned versions in `requirements.txt` have no prebuilt wheels for Python 3.13, so use Python 3.11 or 3.12 with the pinned file. On Python 3.13 the pins for NumPy, pandas and SciPy fail to build; loosen them to newer releases and run the tests yourself.
+**Verified on Python 3.11 on Windows.** The pinned versions in `requirements.txt` have no prebuilt wheels for Python 3.13, so use Python 3.11 with the pinned file (3.12 is untested). On Python 3.13 the pins for NumPy, pandas and SciPy fail to build; loosen them to newer releases and run the tests yourself.
 
 ```bash
 git clone https://github.com/maahin-1/quant-systems-market-impact-signal-risk-collection.git
@@ -118,6 +124,7 @@ Copy `.env.example` to `.env` and fill in only what you need. Never commit your 
 | Variable | Needed for | Description |
 | --- | --- | --- |
 | `OPENROUTER_API_KEY` | Ask LLM | Key from [openrouter.ai](https://openrouter.ai) |
+| `OPENROUTER_MODEL` | Ask LLM (optional) | Free model to try first. Default: `nvidia/nemotron-3-ultra-550b-a55b:free`. Browse free models at [openrouter.ai/models?q=free](https://openrouter.ai/models?q=free). |
 | `SUPABASE_URL` | Persistence (optional) | Your Supabase project URL |
 | `SUPABASE_KEY` | Persistence (optional) | Supabase service role key. Keep it secret. |
 
@@ -159,7 +166,7 @@ quant-dashboard/
     cache.py              In-memory cache, background refresh, anomaly checks
     supabase_client.py    Optional OHLCV persistence
   llm/
-    client.py             OpenRouter client with 9-model fallback
+    client.py             OpenRouter client with 8-model fallback
     prompts.py            Prompt templates per tab
   modules/
     market_impact.py      Market Impact tab
@@ -185,7 +192,7 @@ The suite is offline: yfinance and OpenRouter calls are mocked, so it needs no n
 
 - **Learning and research tool.** It makes no trading recommendations, and its numbers are not validated for real trading.
 - **Free data.** yfinance is an unofficial source. It can lag, return gaps or change without notice, and intraday history is limited to recent days.
-- **Free-tier LLMs.** The commentary comes from free OpenRouter models, which can be slow, rate-limited or wrong. Treat it as a draft explanation, not analysis.
+- **Free-tier LLMs.** The commentary comes from free OpenRouter models, which can be slow, rate-limited or wrong, and the free list changes often. During testing two of the eight models in the chain returned rate-limit errors and two returned empty text, so the fallback matters. If every call fails, update the list in `llm/client.py` or set `OPENROUTER_MODEL`. The wording can sound like trading advice (for example "exit the position"); it is not. Treat it as a draft explanation, not analysis.
 - **Verified on one setup:** Python 3.11 on Windows. Other platforms and Python versions are untested.
 
 ---
@@ -208,10 +215,10 @@ No, not to see the charts. You need an OpenRouter key for the Ask LLM button, an
 How quickly the autocorrelation of returns falls off as the lag grows. The dashboard reports a half-life: the first lag where correlation drops below half of its peak.
 
 ### What does the 3D risk surface show?
-Rolling volatility across several symbols and time, drawn as a surface so you can compare risk between assets at a glance.
+Rolling volatility across lag (bars) and asset, drawn as a surface so you can compare risk between several symbols at a glance.
 
 ### Which Python version should I use?
-Python 3.11 (verified) or 3.12. The pinned NumPy, pandas and SciPy versions do not install on Python 3.13 without loosening the pins.
+Python 3.11 (verified). Python 3.12 is untested. The pinned NumPy, pandas and SciPy versions do not install on Python 3.13 without loosening the pins.
 
 ### Is this investment advice?
 No. It is a research and learning dashboard and makes no trading recommendations.
